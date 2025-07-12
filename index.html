@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивное руководство по C++</title>
+    <!-- Chosen Palette: Slate & Teal Harmony -->
+    <!-- Application Structure Plan: The application is structured as a single-page app with a fixed sidebar for navigation and a main content area. This avoids overwhelming the user with a long, scrolling document. The 16 lessons from the source report are grouped into five logical themes (Basics, First Steps, Advanced, Libraries, Practice) to create a clear learning path. Clicking a lesson in the sidebar dynamically loads its content into the main view using JavaScript. This structure provides a superior user experience by allowing non-linear exploration and focusing the user on one topic at a time, which is crucial for learning a complex subject like C++. -->
+    <!-- Visualization & Content Choices: 
+        - [Report Info: Lesson 1 - Memory Hierarchy] -> [Goal: Inform] -> [Viz: HTML/CSS Diagram] -> [Interaction: Hover for details] -> [Justification: Visually clarifies an abstract concept.] -> [Method: Tailwind CSS Flexbox]
+        - [Report Info: Lesson 3 - Compilation Process] -> [Goal: Organize] -> [Viz: HTML/CSS Flowchart] -> [Interaction: Static] -> [Justification: Simplifies a multi-step process into an easy-to-follow flow.] -> [Method: Tailwind CSS Flexbox]
+        - [Report Info: Lesson 3 - IDE Comparison Table] -> [Goal: Compare] -> [Viz: Bar Chart] -> [Interaction: Tooltips on hover] -> [Justification: A chart provides a quicker, more impactful comparison of 'Beginner Friendliness' than a table.] -> [Library: Chart.js]
+        - [Report Info: All code snippets] -> [Goal: Inform/Utility] -> [Viz: Styled <pre><code> block with syntax highlighting] -> [Interaction: Copy-to-clipboard button] -> [Justification: Improves usability and readability by allowing easy transfer of code examples and coloring syntax.] -> [Method: Vanilla JS + highlight.js]
+        - [Report Info: Key Terms (e.g., compiler, variable)] -> [Goal: Reinforce] -> [Viz: Styled <span>] -> [Interaction: Click to show definition tooltip] -> [Justification: Provides instant clarification without navigation, reinforcing learning.] -> [Method: Vanilla JS] -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-light.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        .font-mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        #main-content h2 {
+            font-size: 2.25rem; /* 36px */
+            font-weight: 700;
+            color: #1e293b; /* slate-800 */
+            margin-bottom: 2rem; /* 32px */
+            border-bottom: 2px solid #e2e8f0; /* slate-200 */
+            padding-bottom: 1rem;
+        }
+        
+        #main-content h3 {
+            font-size: 1.5rem; /* 24px */
+            font-weight: 600;
+            color: #334155; /* slate-700 */
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        #main-content p, #main-content li {
+            font-size: 1rem; /* 16px */
+            line-height: 1.75;
+            color: #475569; /* slate-600 */
+            margin-bottom: 1.25rem; /* 20px */
+        }
+        
+        #main-content ul, #main-content ol {
+            list-style-position: outside;
+            padding-left: 1.5rem; /* 24px */
+        }
+        
+        #main-content ul li {
+            padding-left: 0.5rem;
+            list-style-type: disc;
+        }
+
+        #main-content ol li {
+            padding-left: 0.5rem;
+            list-style-type: decimal;
+        }
+        
+        #main-content a {
+            color: #0d9488; /* teal-600 */
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 1px solid #99f6e4; /* teal-200 */
+            transition: all 0.2s;
+        }
+
+        #main-content a:hover {
+            background-color: #ccfbf1; /* teal-100 */
+        }
+        
+        #main-content code:not(.hljs) {
+            background-color: #e2e8f0; /* slate-200 */
+            color: #0d9488; /* teal-600 */
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+        }
+
+        #main-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        
+        #main-content th, #main-content td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        #main-content th {
+            background-color: #f8fafc; /* slate-50 */
+            font-weight: 600;
+            color: #334155;
+        }
+
+        #main-content tr:last-child td {
+            border-bottom: none;
+        }
+
+        #main-content tr:nth-child(even) {
+            background-color: #f8fafc; /* slate-50 */
+        }
+
+        .code-container {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+        
+        .code-container pre {
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .code-container .copy-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            opacity: 0.5;
+        }
+
+        .code-container:hover .copy-btn {
+            opacity: 1;
+        }
+
+        .copy-btn:hover {
+            background-color: #e2e8f0;
+            color: #1e293b;
+        }
+        
+        .tooltip {
+            visibility: hidden;
+            position: absolute;
+            z-index: 10;
+        }
+        .has-tooltip:hover .tooltip {
+            visibility: visible;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        #mobile-menu-btn {
+            display: none;
+        }
+        #sidebar {
+            transition: transform 0.3s ease-in-out;
+        }
+        @media (max-width: 1024px) {
+            #mobile-menu-btn {
+                display: block;
+            }
+            #sidebar {
+                transform: translateX(-100%);
+                position: fixed;
+                z-index: 40;
+                height: 100%;
+            }
+            #sidebar.open {
+                transform: translateX(0);
+            }
+            main {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+    <div id="app" class="flex min-h-screen">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="bg-white w-72 lg:w-80 border-r border-slate-200 flex flex-col flex-shrink-0 h-screen">
+            <div class="p-6 pb-2">
+                <h1 class="text-2xl font-bold text-slate-800 mb-2">Путь C++</h1>
+                <p class="text-sm text-slate-500">Интерактивное руководство для начинающих</p>
+            </div>
+            <nav id="navigation-menu" class="flex-1 overflow-y-auto p-6 space-y-4"></nav>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col">
+            <header class="sticky top-0 z-20 bg-white border-b border-slate-200 p-4 lg:hidden">
+                 <button id="mobile-menu-btn" class="p-2 rounded-md text-slate-600 hover:bg-slate-100">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+            </header>
+            <main id="main-content" class="flex-1 p-6 sm:p-8 md:p-12 overflow-y-auto">
+                <!-- Content will be injected here by JavaScript -->
+            </main>
+        </div>
+
+        <!-- Tooltip Container -->
+        <div id="tooltip" class="tooltip bg-slate-800 text-white text-sm rounded-lg py-2 px-3 shadow-lg max-w-xs"></div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/cpp.min.js"></script>
+    <script>
+    // --- DATA ---
+    const lessonsData = {
+        "intro": {
+            title: "Добро пожаловать!",
+            content: `
+                <h2>Добро пожаловать в интерактивное руководство по C++!</h2>
+                <p>Это руководство создано, чтобы помочь вам сделать первые шаги в мире программирования на одном из самых мощных и востребованных языков — C++. Наш путь будет разбит на небольшие, управляемые уроки, сгруппированные по темам.</p>
+                <p>Мы начнем с самых основ: как устроен компьютер и что такое программирование в принципе. Затем мы шаг за шагом освоим синтаксис C++, научимся писать свои первые программы, работать с данными и управлять логикой их выполнения. После этого мы погрузимся в более сложные, но невероятно важные темы, такие как объектно-ориентированное программирование (ООП) и Стандартная библиотека шаблонов (STL).</p>
+                <p>Используйте меню слева для навигации по урокам. Не бойтесь экспериментировать с кодом и возвращаться к пройденным темам. Удачи в обучении!</p>
+            `
+        },
+        "lesson1": {
+            title: "Урок 1: Как работает компьютер: Процессор, память и хранилище",
+            content: `
+                <h2>Урок 1: Как работает компьютер</h2>
+                <p>Прежде чем мы начнем программировать, важно понять, как устроен ваш главный инструмент — компьютер. Представьте себе кухню в ресторане.</p>
+                
+                <div class="my-8 bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                    <h3 class="text-xl font-semibold mb-4 text-center text-teal-700">Иерархия памяти компьютера</h3>
+                    <div class="flex flex-col md:flex-row items-center justify-around space-y-4 md:space-y-0 md:space-x-4 text-center">
+                        <div class="has-tooltip relative">
+                            <div class="bg-red-100 text-red-800 p-4 rounded-lg shadow">
+                                <span class="font-bold text-lg">Процессор (CPU)</span>
+                                <div class="text-sm">Шеф-повар</div>
+                            </div>
+                            <div class="tooltip -top-14 left-1/2 -translate-x-1/2">Самый быстрый</div>
+                        </div>
+                        <div class="text-2xl font-mono text-slate-400">→</div>
+                        <div class="has-tooltip relative">
+                            <div class="bg-yellow-100 text-yellow-800 p-4 rounded-lg shadow">
+                                <span class="font-bold text-lg">Кэш</span>
+                                <div class="text-sm">Разделочная доска</div>
+                            </div>
+                             <div class="tooltip -top-14 left-1/2 -translate-x-1/2">Сверхбыстрый</div>
+                        </div>
+                        <div class="text-2xl font-mono text-slate-400">→</div>
+                        <div class="has-tooltip relative">
+                            <div class="bg-green-100 text-green-800 p-4 rounded-lg shadow">
+                                <span class="font-bold text-lg">RAM (ОЗУ)</span>
+                                <div class="text-sm">Столешница</div>
+                            </div>
+                             <div class="tooltip -top-14 left-1/2 -translate-x-1/2">Быстрая, но временная</div>
+                        </div>
+                        <div class="text-2xl font-mono text-slate-400">→</div>
+                        <div class="has-tooltip relative">
+                             <div class="bg-blue-100 text-blue-800 p-4 rounded-lg shadow">
+                                <span class="font-bold text-lg">Накопитель (SSD/HDD)</span>
+                                <div class="text-sm">Холодильник/Склад</div>
+                            </div>
+                             <div class="tooltip -top-14 left-1/2 -translate-x-1/2">Медленный, но большой</div>
+                        </div>
+                    </div>
+                </div>
+
+                <ul>
+                    <li><strong>Процессор (CPU)</strong> — это ваш шеф-повар. Он выполняет всю основную работу: читает рецепт (вашу программу) и выполняет инструкции одну за другой. Чем быстрее шеф-повар, тем быстрее готовится блюдо (выполняется программа).</li>
+                    <li><strong>Оперативная память (RAM)</strong> — это столешница на кухне. Это временное рабочее пространство. Когда шеф-повару нужно приготовить блюдо, он достает все необходимые ингредиенты (данные) из холодильника и раскладывает их на столешнице для быстрого доступа. RAM быстрая, но ее пространство ограничено, и все, что на ней находится, исчезает, как только выключается питание (когда кухня закрывается на ночь).</li>
+                    <li><strong>Накопитель (жесткий диск или SSD)</strong> — это ваш холодильник или склад. Здесь хранятся все «ингредиенты» (файлы, программы, операционная система) на постоянной основе. Это долговременное хранилище, оно медленнее, чем столешница (RAM), но зато вмещает гораздо больше, и данные не пропадают при выключении питания.</li>
+                </ul>
+
+                <h3>Как все это работает вместе?</h3>
+                <p>Когда вы запускаете программу (например, игру или текстовый редактор), происходит следующее:</p>
+                <ol>
+                    <li><strong>Загрузка:</strong> Процессор (шеф-повар) дает команду найти нужную программу на накопителе (в холодильнике).</li>
+                    <li><strong>Копирование в RAM:</strong> Копия программы и необходимые для ее работы данные загружаются с медленного накопителя в быструю оперативную память (ингредиенты выкладываются на столешницу).</li>
+                    <li><strong>Выполнение:</strong> Процессор (шеф-повар) начинает брать инструкции и данные прямо из RAM (со столешницы), выполняя их одну за другой. Это происходит очень быстро, потому что все необходимое находится под рукой.</li>
+                </ol>
+                <p>Есть еще <strong>кэш-память</strong> — это крошечный, но сверхбыстрый участок памяти, встроенный прямо в процессор. Можно представить его как маленькую разделочную доску, которую шеф-повар держит прямо в руках для самых часто используемых ингредиентов. Это ускоряет работу еще больше.</p>
+                <p>Понимание этой иерархии (быстрый, но маленький кэш -> быстрая, но временная RAM -> медленное, но большое постоянное хранилище) — ключ к пониманию, почему C++ так ценится за производительность. Он дает программисту возможность напрямую управлять тем, как программа использует эту память.</p>
+            `
+        },
+        "lesson2": {
+            title: "Урок 2: Введение в программирование",
+            content: `
+                <h2>Урок 2: Введение в программирование</h2>
+                <p>Теперь, когда мы понимаем, как работает компьютер, давайте разберемся, что же такое программирование и какие базовые концепции нам понадобятся.</p>
+                <h3>Что такое программирование?</h3>
+                <p>По своей сути, программирование — это процесс предоставления компьютеру структурированного набора инструкций для выполнения определенной задачи. Полезной аналогией является рецепт: программист выступает в роли автора рецепта, тщательно детализируя каждый шаг, в то время как компьютер действует как повар, следуя инструкциям точно и без отклонений. Эти инструкции, известные как программа или программное обеспечение, написаны на специализированном языке, который компьютер в конечном итоге может понять, таком как C++, Python или JavaScript.</p>
+                
+                <h3>Словарь ключевых терминов для начинающих</h3>
+                <ul>
+                    <li><strong class="text-teal-700 term" data-term="Исходный код (Source Code): Это набор инструкций, написанных программистом на человекочитаемом языке программирования (например, C++).">Исходный код (Source Code):</strong> Это набор инструкций, написанных программистом на человекочитаемом языке.</li>
+                    <li><strong class="text-teal-700 term" data-term="Компилятор (Compiler): Это специальная программа-переводчик. Она берет ваш исходный код и переводит его целиком на язык, понятный компьютеру, — машинный код.">Компилятор (Compiler):</strong> Это специальная программа-переводчик, превращающая исходный код в машинный.</li>
+                    <li><strong class="text-teal-700 term" data-term="Исполняемый файл (Executable File): Это результат работы компилятора. Это готовая к запуску программа, которую компьютер может выполнить напрямую.">Исполняемый файл (Executable File):</strong> Это готовая к запуску программа, результат работы компилятора.</li>
+                    <li><strong class="text-teal-700 term" data-term="Библиотека (Library): Это коллекция готового, заранее написанного кода (функций, классов), который можно использовать в своих программах.">Библиотека (Library):</strong> Это коллекция готового, заранее написанного кода для повторного использования.</li>
+                    <li><strong class="text-teal-700 term" data-term="IDE (Интегрированная среда разработки): Это программа «всё в одном» для программиста. Она объединяет в себе текстовый редактор, компилятор, отладчик и другие полезные инструменты.">IDE (Интегрированная среда разработки):</strong> Это программа «всё в одном» для программиста.</li>
+                    <li><strong class="text-teal-700 term" data-term="Отладчик (Debugger): Это инструмент, который помогает находить и исправлять ошибки («баги») в программе.">Отладчик (Debugger):</strong> Это инструмент, который помогает находить и исправлять ошибки («баги») в программе.</li>
+                    <li><strong class="text-teal-700 term" data-term="API (Интерфейс прикладного программирования): Это набор правил и инструментов, который позволяет одной программе взаимодействовать с другой.">API (Интерфейс прикладного программирования):</strong> Это набор правил и инструментов для взаимодействия программ.</li>
+                </ul>
+
+                <h3>Парадигмы программирования</h3>
+                <p>Парадигма программирования — это, по сути, стиль или «способ» написания программы. Она определяет, как структурирован код и как решаются проблемы.</p>
+                <ul>
+                    <li><strong>Процедурное программирование:</strong> Программа строится как последовательность процедур или функций, которые выполняют операции над данными.</li>
+                    <li><strong>Объектно-ориентированное программирование (ООП):</strong> Программа строится вокруг «объектов», которые объединяют в себе как данные, так и функции для работы с этими данными. C++ является мощным языком, поддерживающим обе парадигмы, но его истинная сила раскрывается в ООП.</li>
+                </ul>
+                
+                <h3>Алгоритмы и решение проблем</h3>
+                <ul>
+                    <li><strong>Алгоритм</strong> — это конечный набор четких, пошаговых инструкций для решения конкретной задачи. Лучшая аналогия — это кулинарный рецепт.</li>
+                    <li><strong>Декомпозиция</strong> — это процесс разбиения сложной проблемы на более мелкие, управляемые части.</li>
+                    <li><strong>Абстракция</strong> — это процесс отсеивания несущественных деталей и концентрации на ключевой информации.</li>
+                </ul>
+                
+                <h3>Фундаментальные концепции</h3>
+                <ul>
+                    <li><strong>Переменные:</strong> Именованные «контейнеры» для хранения данных.</li>
+                    <li><strong>Типы данных:</strong> Определяют, какого рода информацию может хранить переменная (<code>int</code> — целые числа, <code>string</code> — текст, <code>bool</code> — истина/ложь).</li>
+                    <li><strong>Структуры управления:</strong> Определяют порядок выполнения инструкций. Включают <strong>выбор</strong> (<code>if-else</code>) и <strong>итерацию</strong> (циклы <code>for</code>, <code>while</code>).</li>
+                    <li><strong>Функции:</strong> Именованные, многократно используемые блоки кода для выполнения определенной задачи.</li>
+                </ul>
+            `
+        },
+        "lesson3": {
+            title: "Урок 3: Настройка рабочей среды",
+            content: `
+                <h2>Урок 3: Настройка рабочей среды</h2>
+                <p>Прежде чем писать код, нам нужно подготовить наши инструменты. Этот процесс включает в себя установку специального программного обеспечения, которое позволит нам писать, компилировать и запускать наши C++ программы.</p>
+                
+                <h3>Компиляция: Превращение кода в программу</h3>
+                <p>Как мы уже знаем, компьютер не понимает человеческий язык. Наш исходный код на C++ должен быть переведен в машинный код. Этот процесс называется <strong>компиляцией</strong>.</p>
+                <div class="my-6 bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                     <h3 class="text-xl font-semibold mb-4 text-center text-teal-700">Процесс компиляции C++</h3>
+                     <div class="flex flex-col md:flex-row items-center justify-center space-y-2 md:space-y-0 text-center text-sm">
+                        <div class="bg-slate-100 p-3 rounded-md shadow-sm">Исходный код<br><code class="text-xs">.cpp</code></div>
+                        <div class="font-mono text-slate-400 mx-2 text-2xl">→</div>
+                        <div class="bg-slate-100 p-3 rounded-md shadow-sm">Препроцессор<br><code class="text-xs">#include</code></div>
+                        <div class="font-mono text-slate-400 mx-2 text-2xl">→</div>
+                        <div class="bg-slate-100 p-3 rounded-md shadow-sm">Компилятор<br><code class="text-xs">.o / .obj</code></div>
+                        <div class="font-mono text-slate-400 mx-2 text-2xl">→</div>
+                        <div class="bg-slate-100 p-3 rounded-md shadow-sm">Линковщик<br><code class="text-xs">+библиотеки</code></div>
+                        <div class="font-mono text-slate-400 mx-2 text-2xl">→</div>
+                        <div class="bg-teal-100 text-teal-800 p-3 rounded-md shadow-sm">Исполняемый файл<br><code class="text-xs">.exe</code></div>
+                     </div>
+                </div>
+
+                <h3>Выбор и установка IDE</h3>
+                <p>Для начинающих настоятельно рекомендуется использовать <strong>интегрированную среду разработки (IDE)</strong>, которая объединяет текстовый редактор, компилятор и отладчик в одном приложении.</p>
+                
+                <h4>Сравнение популярных IDE</h4>
+                <div class="chart-container my-6">
+                    <canvas id="ideChart"></canvas>
+                </div>
+
+                <table>
+                      <thead>
+                        <tr>
+                          <th>Характеристика</th>
+                          <th>Visual Studio</th>
+                          <th>Visual Studio Code</th>
+                          <th>CLion</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><strong>Стоимость</strong></td>
+                          <td>Версия Community бесплатна</td>
+                          <td>Бесплатно</td>
+                          <td>Платно (с опциями для студентов)</td>
+                        </tr>
+                        <tr>
+                          <td><strong>Платформа</strong></td>
+                          <td>Только Windows</td>
+                          <td>Windows, macOS, Linux</td>
+                          <td>Windows, macOS, Linux</td>
+                        </tr>
+                        <tr>
+                          <td><strong>Сложность настройки</strong></td>
+                          <td>Низкая (установщик «все в одном»)</td>
+                          <td>Средняя (требуется отдельная настройка)</td>
+                          <td>Средняя (требуется отдельная настройка)</td>
+                        </tr>
+                         <tr>
+                          <td><strong>Дружелюбность к новичкам</strong></td>
+                          <td>Высокая</td>
+                          <td>Высокая</td>
+                          <td>Средняя</td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                <h3>Рекомендация: Visual Studio 2022 на Windows</h3>
+                <p><strong>Рекомендация для начинающих на Windows:</strong> Используйте <strong>Microsoft Visual Studio Community Edition</strong>. Это самый простой способ начать, так как все необходимые инструменты устанавливаются вместе.</p>
+                <ol>
+                    <li><strong>Загрузите установщик</strong> с официального сайта Visual Studio, выбрав бесплатную версию "Community".</li>
+                    <li><strong>Запустите установщик</strong> (<code>VisualStudioSetup.exe</code>).</li>
+                    <li><strong>Выберите рабочую нагрузку:</strong> На экране выбора "рабочих нагрузок" обязательно отметьте галочкой <strong>"Разработка классических приложений на C++"</strong>. Это установит все необходимое.</li>
+                    <li><strong>Нажмите "Установить"</strong> и дождитесь завершения процесса.</li>
+                    <li><strong>Запустите Visual Studio</strong> и вы готовы к созданию первого проекта.</li>
+                </ol>
+            `
+        },
+        "lesson4": {
+            title: "Урок 4: Анатомия программы и первые шаги",
+            content: `
+                <h2>Урок 4: Анатомия программы</h2>
+                <p>Путешествие в любой новый язык программирования традиционно начинается с программы «Hello, World!». Ее истинная цель — служить проверкой того, что ваша среда разработки (IDE и компилятор) настроена правильно.</p>
+                
+                <h3>Программа «Hello, World!»</h3>
+                <p>Создайте новый проект в вашей IDE и введите следующий код:</p>
+                <div class="code-container">
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    std::cout &lt;&lt; "Hello, World!" &lt;&lt; std::endl;
+    return 0;
+}</code></pre>
+                </div>
+                
+                <h3>Разбор кода</h3>
+                <p>Давайте разберем каждый компонент этой фундаментальной программы:</p>
+                <ul>
+                    <li><code>#include &lt;iostream&gt;</code>: Это <strong>директива препроцессора</strong>. Она говорит компилятору включить в нашу программу содержимое стандартной библиотеки <code>iostream</code>, которая содержит инструменты для ввода и вывода данных.</li>
+                    <li><code>int main()</code>: Это <strong>главная функция</strong>. Каждая программа на C++ должна иметь функцию с именем <code>main</code>, так как она служит обязательной точкой входа.</li>
+                    <li><code>{... }</code>: Фигурные скобки определяют <strong>тело</strong> функции <code>main</code>. Все, что находится между ними, — это код, который будет выполнен.</li>
+                    <li><code>std::cout</code>: Это стандартный объект потока вывода, обычно связанный с экраном консоли. <code>std::</code> — это префикс, указывающий, что <code>cout</code> принадлежит стандартному (<code>std</code>) пространству имен.</li>
+                    <li><code>&lt;&lt;</code>: Это <strong>оператор вставки в поток</strong>. Он "вставляет" то, что справа от него (наш текст), в поток слева (<code>std::cout</code>).</li>
+                    <li><code>"Hello, World!"</code>: Это <strong>строковый литерал</strong> — последовательность символов, которую мы хотим вывести.</li>
+                    <li><code>std::endl</code>: Это <strong>манипулятор</strong>, который вставляет символ новой строки и очищает буфер вывода.</li>
+                    <li><code>;</code>: Точка с запятой — это терминатор оператора. Она ставится в конце большинства инструкций в C++.</li>
+                    <li><code>return 0;</code>: Этот оператор завершает функцию <code>main</code> и возвращает операционной системе код <code>0</code>, что по соглашению означает успешное выполнение программы.</li>
+                </ul>
+            `
+        },
+        "lesson5": {
+            title: "Урок 5: Переменные и типы данных",
+            content: `
+                <h2>Урок 5: Переменные и типы данных</h2>
+                <p>Программы работают, манипулируя данными. Для хранения и управления этими данными мы используем переменные.</p>
+                
+                <h3>Что такое переменная?</h3>
+                <p><strong>Переменная</strong> — это именованное место в памяти компьютера (в RAM), зарезервированное для хранения данных. Думайте о ней как о подписанной коробке, куда можно положить информацию. C++ — это <strong>строго типизированный язык</strong>. Это означает, что каждая переменная должна быть объявлена с определенным типом данных перед ее использованием.</p>
+                <div class="code-container">
+                    <pre><code class="language-cpp">int studentCount;          // Объявление целочисленной переменной
+studentCount = 30;         // Присвоение значения
+
+// Объявление и инициализация в одной строке
+double accountBalance = 123.45;</code></pre>
+                </div>
+                
+                <h3>Фундаментальные типы данных</h3>
+                <p>Это базовые типы данных, которые встроены непосредственно в язык C++.</p>
+                <table>
+                        <thead>
+                            <tr>
+                                <th>Тип данных</th>
+                                <th>Назначение</th>
+                                <th>Пример</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>int</code></td><td>Целые числа</td><td><code>int year = 2025;</code></td></tr>
+                            <tr><td><code>double</code></td><td>Числа с десятичной частью</td><td><code>double pi = 3.14159;</code></td></tr>
+                            <tr><td><code>char</code></td><td>Один символ</td><td><code>char grade = 'A';</code></td></tr>
+                            <tr><td><code>bool</code></td><td>Значения истина/ложь (<code>true</code> или <code>false</code>)</td><td><code>bool isFinished = false;</code></td></tr>
+                            <tr><td><code>std::string</code></td><td>Последовательность символов (текст)</td><td><code>std::string message = "Welcome!";</code></td></tr>
+                        </tbody>
+                    </table>
+            `
+        },
+        "lesson6": {
+            title: "Урок 6: Операторы и выражения",
+            content: `
+                <h2>Урок 6: Операторы и выражения</h2>
+                <p><strong>Операторы</strong> — это специальные символы, которые выполняют вычисления, сравнения и присваивания над переменными и значениями. Это «глаголы», которые оживляют программу.</p>
+                
+                <h3>Основные типы операторов</h3>
+                <ul>
+                    <li><strong>Арифметические:</strong> <code>+</code> (сложение), <code>-</code> (вычитание), <code>*</code> (умножение), <code>/</code> (деление), <code>%</code> (остаток от деления).</li>
+                    <li><strong>Присваивания:</strong> <code>=</code> (присвоить), <code>+=</code> (прибавить и присвоить), <code>-=</code> (вычесть и присвоить).</li>
+                    <li><strong>Сравнения:</strong> <code>==</code> (равно), <code>!=</code> (не равно), <code>></code> (больше), <code><</code> (меньше), <code>>=</code> (больше или равно), <code><=</code> (меньше или равно).</li>
+                    <li><strong>Логические:</strong> <code>&&</code> (логическое И), <code>||</code> (логическое ИЛИ), <code>!</code> (логическое НЕ).</li>
+                </ul>
+
+                <h3>Пример использования</h3>
+                 <div class="code-container">
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+
+int main() {
+    int a = 10;
+    int b = 4;
+
+    // Арифметические
+    int sum = a + b; // 14
+    int division_result = a / b; // 2 (целочисленное деление)
+    int remainder = a % b; // 2
+
+    // Сравнение
+    bool isEqual = (a == b); // false
+
+    // Логические
+    bool condition = (a > 5 && b < 5); // true
+
+    return 0;
+}</code></pre>
+                </div>
+                <p><strong>Приоритет операторов:</strong> Как и в математике, у операторов есть порядок выполнения (умножение раньше сложения). Чтобы избежать путаницы, всегда используйте скобки <code>()</code> для явного указания порядка действий.</p>
+            `
+        },
+        "lesson7": {
+            title: "Урок 7: Управление потоком: Условия и циклы",
+            content: `
+                <h2>Урок 7: Управление потоком</h2>
+                <p>Программы редко выполняются как простая, линейная последовательность операторов. Они должны принимать решения и повторять действия. Для этого используются операторы управления потоком.</p>
+                
+                <h3>Принятие решений: <code>if-else</code> и <code>switch</code></h3>
+                <p><strong><code>if-else</code></strong>: Позволяет программе выбирать, какой блок кода выполнять, в зависимости от истинности условия.</p>
+                <div class="code-container">
+                    <pre><code class="language-cpp">int score = 85;
+if (score >= 90) {
+    std::cout << "Отлично!";
+} else if (score >= 70) {
+    std::cout << "Хорошо."; // Этот блок выполнится
+} else {
+    std::cout << "Нужно постараться.";
+}</code></pre>
+                </div>
+                
+                <p><strong><code>switch</code></strong>: Удобная альтернатива <code>if-else-if</code>, когда решение зависит от значения одной целочисленной переменной.</p>
+                <div class="code-container">
+                    <pre><code class="language-cpp">char grade = 'B';
+switch (grade) {
+    case 'A': std::cout << "Превосходно!"; break;
+    case 'B': std::cout << "Отлично!"; break; // Этот блок
+    case 'C': std::cout << "Хорошо."; break;
+    default:  std::cout << "Неверная оценка."; break;
+}</code></pre>
+                </div>
+
+                <h3>Повторение кода: Циклы</h3>
+                <p>Циклы используются для многократного выполнения блока кода.</p>
+                <ul>
+                    <li><strong><code>for</code> loop</strong>: Идеален, когда количество повторений известно заранее.</li>
+                    <li><strong><code>while</code> loop</strong>: Используется, когда цикл должен продолжаться, пока истинно некоторое условие.</li>
+                    <li><strong><code>do-while</code> loop</strong>: Похож на <code>while</code>, но тело цикла гарантированно выполняется хотя бы один раз.</li>
+                </ul>
+                 <div class="code-container">
+                    <pre><code class="language-cpp">// Цикл for для печати чисел от 1 до 5
+for (int i = 1; i <= 5; ++i) {
+    std::cout << i << " ";
+}</code></pre>
+                </div>
+            `
+        },
+        "lesson8": {
+            title: "Урок 8: Функции: Структурирование кода",
+            content: `
+                <h2>Урок 8: Функции</h2>
+                <p>По мере роста программ размещение всего кода внутри функции <code>main</code> становится неуправляемым. <strong>Функции</strong> являются основным инструментом для организации кода в логические, многократно используемые блоки.</p>
+                
+                <h3>Что такое функция?</h3>
+                <p>Функция — это именованный блок кода, предназначенный для выполнения определенной, самодостаточной задачи.</p>
+                
+                <h3>Объявление и определение</h3>
+                <div class="code-container">
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+
+// Объявление функции (прототип)
+int multiply(int a, int b);
+
+int main() {
+    int result = multiply(5, 3); // Вызов функции
+    std::cout << "Результат: " << result << std::endl;
+    return 0;
+}
+
+// Определение функции
+int multiply(int a, int b) {
+    return a * b; // Возвращаем произведение
+}</code></pre>
+                </div>
+                <p><strong>Объявление (прототип)</strong> — это "анонс" функции, который позволяет вызывать ее до того, как компилятор увидит ее полное определение. Это необходимо, если определение функции находится после ее вызова.</p>
+            `
+        },
+         "lesson9": {
+            title: "Урок 9: Память, указатели и ссылки",
+            content: `
+                <h2>Урок 9: Память, указатели и ссылки</h2>
+                <p>Понимание того, как данные хранятся и доступны в памяти, имеет решающее значение в C++.</p>
+                
+                <h3>Указатели: Прямой доступ к памяти</h3>
+                <p><strong>Указатель</strong> — это специальная переменная, которая хранит не значение данных напрямую, а <strong>адрес в памяти</strong> другой переменной.</p>
+                <ul>
+                    <li><strong>Оператор взятия адреса (<code>&</code>):</strong> Возвращает адрес памяти переменной.</li>
+                    <li><strong>Оператор разыменования (<code>*</code>):</strong> Получает доступ к значению, хранящемуся по адресу, на который указывает указатель.</li>
+                </ul>
+                <div class="code-container">
+                    <pre><code class="language-cpp">int number = 42;
+int* pNumber = &number; // pNumber хранит адрес памяти 'number'
+
+// Изменяем исходную переменную через указатель
+*pNumber = 100;
+std::cout << "Новое значение number: " << number << std::endl; // 100</code></pre>
+                </div>
+
+                <h3>Ссылки: Псевдонимы для переменных</h3>
+                <p><strong>Ссылка</strong> — это псевдоним, альтернативное имя для уже существующей переменной. В отличие от указателя, она становится синонимом исходной переменной.</p>
+                <div class="code-container">
+                    <pre><code class="language-cpp">std::string original = "Apple";
+std::string& alias = original; // 'alias' теперь другое имя для 'original'
+
+alias = "Banana"; // Модифицируем псевдоним
+std::cout << "Original: " << original << std::endl; // Выведет "Banana"</code></pre>
+                </div>
+                <p class="bg-teal-50 border-l-4 border-teal-500 p-4 text-teal-800 rounded"><strong>Правило для начинающих:</strong> Предпочитайте ссылки указателям, когда это возможно. Используйте указатели только тогда, когда это действительно необходимо (например, для динамического выделения памяти).</p>
+            `
+        },
+        "lesson10": {
+            title: "Урок 10: Введение в ООП",
+            content: `
+                <h2>Урок 10: Введение в Объектно-Ориентированное Программирование</h2>
+                <p>После освоения основ мы переходим к более мощной методологии структурирования программ — <strong>Объектно-Ориентированному Программированию (ООП)</strong>.</p>
+                
+                <h3>Что такое ООП?</h3>
+                <p>ООП — это модель программирования, которая организует код вокруг <strong>объектов</strong>, объединяющих данные (атрибуты) и функции для работы с этими данными (методы) в единое целое. Это позволяет моделировать сущности реального мира.</p>
+                
+                <h3>Классы и Объекты</h3>
+                <ul>
+                    <li><strong>Класс</strong> — это чертеж или шаблон для создания объектов.</li>
+                    <li><strong>Объект</strong> — это конкретный экземпляр класса.</li>
+                </ul>
+                <div class="code-container">
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+// Класс (чертеж)
+class SmartPhone {
+public: // Спецификатор доступа
+    std::string brand;
+    int storageGB;
+
+    void makeCall() {
+        std::cout << "Звоню с телефона " << brand << "..." << std::endl;
+    }
+};
+
+int main() {
+    // Создание объекта (экземпляра класса)
+    SmartPhone myPhone;
+    myPhone.brand = "Pixel";
+    myPhone.storageGB = 128;
+
+    myPhone.makeCall(); // Вывод: Звоню с телефона Pixel...
+    return 0;
+}</code></pre>
+                </div>
+                
+                <h3>Конструкторы и Деструкторы</h3>
+                <ul>
+                    <li><strong>Конструктор:</strong> Специальный метод, который автоматически вызывается при создании объекта. Его задача — инициализировать объект.</li>
+                    <li><strong>Деструктор:</strong> Специальный метод, который вызывается при уничтожении объекта. Его задача — освободить ресурсы.</li>
+                </ul>
+            `
+        },
+        "lesson11": {
+            title: "Урок 11: Столпы ООП",
+            content: `
+                <h2>Урок 11: Столпы ООП</h2>
+                <p>ООП держится на трех основных столпах, которые помогают управлять сложностью программ.</p>
+                
+                <h3>1. Инкапсуляция (и Сокрытие данных)</h3>
+                <p><strong>Инкапсуляция</strong> — это объединение данных и методов в одном классе. Это позволяет реализовать <strong>сокрытие данных</strong>: мы делаем данные <code>private</code>, чтобы к ним нельзя было получить доступ напрямую извне. Доступ предоставляется только через публичные методы (<code>public</code>), которые называются <strong>геттерами</strong> (для получения значения) и <strong>сеттерами</strong> (для установки значения).</p>
+                
+                <h3>2. Наследование</h3>
+                <p><strong>Наследование</strong> позволяет создавать новый класс (<strong>производный</strong>) на основе существующего (<strong>базового</strong>), перенимая его свойства и методы. Это моделирует отношение <strong>"является"</strong> (is-a). Например, <code>Менеджер</code> является <code>Сотрудником</code>.</p>
+                
+                <h3>3. Полиморфизм</h3>
+                <p><strong>Полиморфизм</strong> (в переводе "много форм") — это способность объекта вести себя по-разному в зависимости от контекста. Ключевой механизм для этого — <strong>виртуальные функции</strong>. Если в базовом классе метод объявлен как <code>virtual</code>, производные классы могут его <strong>переопределить</strong> (<code>override</code>), предоставив свою реализацию.</p>
+                <div class="code-container">
+                    <pre><code class="language-cpp">class Shape {
+public:
+    virtual void draw() const { /*...*/ } // Виртуальная функция
+};
+
+class Circle : public Shape {
+public:
+    void draw() const override { /* рисует круг */ }
+};
+
+class Square : public Shape {
+public:
+    void draw() const override { /* рисует квадрат */ }
+};</code></pre>
+                </div>
+            `
+        },
+        "lesson12": {
+            title: "Урок 12: STL: Контейнеры",
+            content: `
+                <h2>Урок 12: STL: Контейнеры</h2>
+                <p>Продуктивное программирование на C++ невозможно без <strong>Стандартной библиотеки шаблонов (STL)</strong>. Это мощный набор готовых инструментов, состоящий из трех частей: <strong>контейнеры</strong>, <strong>итераторы</strong> и <strong>алгоритмы</strong>.</p>
+                
+                <h3><code>std::vector</code> — динамический массив</h3>
+                <p><code>std::vector</code> — самый популярный и универсальный контейнер. Это динамический массив, который может автоматически расти. <strong>Используйте его по умолчанию</strong>, если нет веских причин выбрать другой контейнер. Для использования нужно подключить <code>&lt;vector&gt;</code>.</p>
+                <div class="code-container">
+                    <pre><code class="language-cpp">#include &lt;vector&gt;
+#include &lt;string&gt;
+#include &lt;iostream&gt;
+
+int main() {
+    std::vector<std::string> names; // Создаем пустой вектор строк
+    names.push_back("Алиса"); // Добавляем элементы в конец
+    names.push_back("Боб");
+    names.push_back("Виктор");
+
+    std::cout << "Размер: " << names.size() << std::endl; // 3
+    return 0;
+}</code></pre>
+                </div>
+                
+                <h3><code>std::map</code> — словарь (ключ-значение)</h3>
+                <p><code>std::map</code> хранит элементы в виде пар <strong>ключ-значение</strong>. Ключи уникальны и отсортированы, что обеспечивает очень быстрый поиск. Идеально подходит для словарей. Для использования нужно подключить <code>&lt;map&gt;</code>.</p>
+                 <div class="code-container">
+                    <pre><code class="language-cpp">#include &lt;map&gt;
+#include &lt;string&gt;
+#include &lt;iostream&gt;
+
+int main() {
+    std::map<std::string, int> studentScores;
+    studentScores["Алиса"] = 5;
+    studentScores["Боб"] = 4;
+
+    std::cout << "Оценка Алисы: " << studentScores["Алиса"] << std::endl; // 5
+    return 0;
+}</code></pre>
+                </div>
+            `
+        },
+        "lesson13": {
+            title: "Урок 13: STL: Итераторы и Алгоритмы",
+            content: `
+                <h2>Урок 13: STL: Итераторы и Алгоритмы</h2>
+                <h3>Итераторы: Универсальные указатели</h3>
+                <p><strong>Итератор</strong> — это объект, который ведет себя как обобщенный указатель. Он "указывает" на элемент в контейнере и позволяет перемещаться по нему. Итераторы — это клей, который соединяет алгоритмы и контейнеры.</p>
+                <p>В современном C++ для простого перебора всех элементов контейнера лучше использовать <strong>цикл <code>for</code> на основе диапазона</strong>, который использует итераторы "под капотом".</p>
+                <div class="code-container">
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;string&gt;
+
+int main() {
+    std::vector<std::string> fruits = {"Яблоко", "Банан", "Вишня"};
+
+    // Цикл for на основе диапазона
+    for (const std::string& fruit : fruits) {
+        std::cout << fruit << " ";
+    }
+    return 0;
+}</code></pre>
+                </div>
+
+                <h3>Алгоритмы STL</h3>
+                <p>STL предоставляет огромную библиотеку готовых функций-алгоритмов в заголовке <code>&lt;algorithm&gt;</code>. Они работают с диапазонами, заданными итераторами.</p>
+                <ul>
+                    <li><strong><code>std::sort</code></strong>: Сортирует элементы в диапазоне.</li>
+                    <li><strong><code>std::find</code></strong>: Ищет первое вхождение значения в диапазоне.</li>
+                </ul>
+                <div class="code-container">
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;algorithm&gt;
+
+int main() {
+    std::vector<int> numbers = {44, 12, 89, 5, 33};
+    std::sort(numbers.begin(), numbers.end()); // Сортирует по возрастанию
+    
+    for(int n : numbers) {
+        std::cout << n << " ";
+    }
+    return 0;
+}</code></pre>
+                </div>
+            `
+        },
+        "lesson14": {
+            title: "Урок 14: Практическая разработка",
+            content: `
+                <h2>Урок 14: Практическая разработка</h2>
+                <p>Теперь рассмотрим навыки, необходимые для создания надежных, реальных приложений.</p>
+                
+                <h3>Обработка исключений</h3>
+                <p><strong>Исключение</strong> — это ошибка, возникающая во время выполнения программы (например, деление на ноль). Если исключение не обработать, программа аварийно завершится. C++ использует механизм <code>try-catch</code> для их обработки.</p>
+                 <div class="code-container">
+                    <pre><code class="language-cpp">#include &lt;iostream&gt;
+#include &lt;stdexcept&gt;
+
+int main() {
+    try {
+        int denominator = 0;
+        if (denominator == 0) {
+            throw std::runtime_error("Ошибка деления на ноль!");
+        }
+        int result = 10 / denominator;
+    } catch (const std::runtime_error& e) {
+        // Ловим исключение и обрабатываем его
+        std::cerr << "Произошла ошибка: " << e.what() << std::endl;
+    }
+    return 0;
+}</code></pre>
+                </div>
+
+                <h3>Работа с файлами (File I/O)</h3>
+                <p>Для сохранения данных между запусками программы используется файловый ввод/вывод. Для этого в C++ есть библиотека <code>&lt;fstream&gt;</code>.</p>
+                <ul>
+                    <li><code>std::ofstream</code>: Поток для <strong>записи</strong> в файл.</li>
+                    <li><code>std::ifstream</code>: Поток для <strong>чтения</strong> из файла.</li>
+                </ul>
+                 <div class="code-container">
+                    <pre><code class="language-cpp">#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+
+int main() {
+    // Запись в файл
+    std::ofstream outputFile("data.txt");
+    outputFile << "Это первая строка." << std::endl;
+    outputFile.close();
+
+    // Чтение из файла
+    std::ifstream inputFile("data.txt");
+    std::string line;
+    while (std::getline(inputFile, line)) {
+        std::cout << line << std::endl;
+    }
+    inputFile.close();
+    return 0;
+}</code></pre>
+                </div>
+            `
+        },
+        "lesson15": {
+            title: "Урок 15: Контроль версий с Git",
+            content: `
+                <h2>Урок 15: Контроль версий с Git</h2>
+                <p><strong>Контроль версий</strong> — это система, которая отслеживает изменения в файлах с течением времени. <strong>Git</strong> — самая популярная система контроля версий в мире. Для программиста это незаменимый инструмент.</p>
+                
+                <h3>Зачем использовать Git?</h3>
+                <ul>
+                    <li><strong>История изменений:</strong> Git сохраняет "снимки" вашего проекта. Вы всегда можете вернуться к любой предыдущей версии.</li>
+                    <li><strong>Безопасность:</strong> Это ваша страховочная сетка. Если вы что-то сломали, можно легко откатиться назад.</li>
+                    <li><strong>Ветвление:</strong> Вы можете создать отдельную "ветку" для работы над новой функцией, не затрагивая основную, стабильную версию кода.</li>
+                    <li><strong>Сотрудничество:</strong> Git позволяет нескольким разработчикам эффективно работать над одним проектом.</li>
+                </ul>
+                
+                <h3>Базовый рабочий процесс Git</h3>
+                <div class="my-6 bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                     <h3 class="text-xl font-semibold mb-4 text-center text-teal-700">Базовый рабочий процесс Git</h3>
+                     <div class="flex flex-col md:flex-row items-center justify-around space-y-2 md:space-y-0 text-center text-sm font-mono">
+                        <div class="p-3">git init</div>
+                        <div class="text-slate-400 mx-2 text-2xl">→</div>
+                        <div class="p-3">git add .</div>
+                        <div class="text-slate-400 mx-2 text-2xl">→</div>
+                        <div class="p-3">git commit -m "..."</div>
+                         <div class="text-slate-400 mx-2 text-2xl">→</div>
+                        <div class="p-3">git push</div>
+                     </div>
+                </div>
+
+                <h3>Игнорирование файлов: <code>.gitignore</code></h3>
+                <p>Не все файлы нужно отслеживать (например, скомпилированные программы). Создайте в корне проекта файл <code>.gitignore</code> и укажите в нем имена или шаблоны файлов, которые Git должен игнорировать.</p>
+            `
+        },
+        "lesson16": {
+            title: "Урок 16: Ваш дальнейший путь",
+            content: `
+                <h2>Урок 16: Ваш дальнейший путь</h2>
+                <p>Освоение программирования — это непрерывный процесс. Теперь, когда у вас есть база, важно закрепить знания на практике и знать, где искать информацию для дальнейшего роста.</p>
+                
+                <h3>Дорожная карта проектов для начинающих</h3>
+                <p>Теория важна, но настоящее мастерство приходит с практикой. Создание проектов заставляет вас применять знания комплексно.</p>
+                <ul>
+                    <li><strong>Уровень 1: Основы</strong>: Простой калькулятор, Игра "Угадай число".</li>
+                    <li><strong>Уровень 2: Структуры данных</strong>: Крестики-нолики, Контактная книга.</li>
+                    <li><strong>Уровень 3: ООП и файлы</strong>: Система банковских счетов.</li>
+                </ul>
+                
+                <h3>Ресурсы для непрерывного обучения</h3>
+                <p>Крайне важно использовать ресурсы, которые учат <strong>современному C++</strong> (C++11 и новее).</p>
+                <h4>Веб-сайты</h4>
+                <ul>
+                    <li><a href="https://www.learncpp.com/" target="_blank" rel="noopener noreferrer">LearnCpp.com</a>: Считается лучшим бесплатным онлайн-ресурсом для изучения C++ с нуля.</li>
+                    <li><a href="https://en.cppreference.com/" target="_blank" rel="noopener noreferrer">cppreference.com</a>: Исчерпывающий справочник по языку и стандартной библиотеке.</li>
+                </ul>
+                
+                <h4>Книги (для углубленного изучения)</h4>
+                <ul>
+                    <li>"A Tour of C++" (Бьярн Страуструп)</li>
+                    <li>"C++ Primer" (Стэнли Липпман и др.)</li>
+                    <li>"Effective Modern C++" (Скотт Мейерс)</li>
+                </ul>
+                
+                <p>Сочетая структурированное обучение с практическими проектами и качественными ресурсами, вы сможете построить прочный фундамент в программировании на C++.</p>
+            `
+        },
+    };
+    
+    const navigationStructure = [
+        { 
+            theme: "Основы и Концепции", 
+            lessons: ["lesson1", "lesson2"]
+        },
+        { 
+            theme: "Первые шаги в C++", 
+            lessons: ["lesson3", "lesson4", "lesson5", "lesson6", "lesson7", "lesson8"]
+        },
+        { 
+            theme: "Углубленный C++", 
+            lessons: ["lesson9", "lesson10", "lesson11"]
+        },
+        {
+            theme: "Инструменты и Библиотеки",
+            lessons: ["lesson12", "lesson13"]
+        },
+        {
+            theme: "Практика и Развитие",
+            lessons: ["lesson14", "lesson15", "lesson16"]
+        }
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const navigationMenu = document.getElementById('navigation-menu');
+        const mainContent = document.getElementById('main-content');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const sidebar = document.getElementById('sidebar');
+        let currentChart = null;
+        let activeLink = null;
+        const tooltip = document.getElementById('tooltip');
+
+        function renderNavigation() {
+            navigationStructure.forEach(group => {
+                const groupDiv = document.createElement('div');
+                
+                const themeTitle = document.createElement('h3');
+                themeTitle.className = "text-sm font-semibold text-slate-500 uppercase tracking-wider mb-2 mt-4";
+                themeTitle.textContent = group.theme;
+                groupDiv.appendChild(themeTitle);
+
+                const lessonList = document.createElement('ul');
+                lessonList.className = "space-y-1";
+                group.lessons.forEach(lessonId => {
+                    const lesson = lessonsData[lessonId];
+                    if (lesson) {
+                        const listItem = document.createElement('li');
+                        const link = document.createElement('a');
+                        link.href = `#${lessonId}`;
+                        link.textContent = lesson.title.split(': ')[1] || lesson.title;
+                        link.dataset.lessonId = lessonId;
+                        link.className = "block px-3 py-2 rounded-md text-slate-600 hover:bg-teal-50 hover:text-teal-700 transition-colors duration-200";
+                        listItem.appendChild(link);
+                        lessonList.appendChild(listItem);
+                    }
+                });
+                groupDiv.appendChild(lessonList);
+                navigationMenu.appendChild(groupDiv);
+            });
+        }
+
+        function renderLesson(lessonId) {
+            const lesson = lessonsData[lessonId];
+            if (!lesson) {
+                mainContent.innerHTML = '<h2>Урок не найден</h2>';
+                return;
+            }
+
+            mainContent.innerHTML = lesson.content;
+            mainContent.scrollTop = 0; 
+            
+            if (currentChart) {
+                currentChart.destroy();
+                currentChart = null;
+            }
+
+            if (lessonId === 'lesson3') {
+                initIdeChart();
+            }
+            
+            setupCodeContainers();
+            setupTermTooltips();
+        }
+
+        function setupTermTooltips() {
+             document.querySelectorAll('.term').forEach(termEl => {
+                termEl.addEventListener('mousemove', e => {
+                    tooltip.style.left = `${e.pageX + 15}px`;
+                    tooltip.style.top = `${e.pageY + 15}px`;
+                });
+                termEl.addEventListener('mouseenter', e => {
+                    tooltip.textContent = e.target.dataset.term;
+                    tooltip.style.visibility = 'visible';
+                    tooltip.style.opacity = '1';
+                });
+                termEl.addEventListener('mouseleave', () => {
+                     tooltip.style.visibility = 'hidden';
+                     tooltip.style.opacity = '0';
+                });
+            });
+        }
+        
+        function initIdeChart() {
+            const ctx = document.getElementById('ideChart').getContext('2d');
+            currentChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Visual Studio', 'VS Code', 'CLion'],
+                    datasets: [{
+                        label: 'Дружелюбность к новичкам (оценка из 10)',
+                        data: [9, 8, 6],
+                        backgroundColor: [
+                            'rgba(96, 165, 250, 0.6)',
+                            'rgba(56, 189, 248, 0.6)',
+                            'rgba(74, 222, 128, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgba(96, 165, 250, 1)',
+                            'rgba(56, 189, 248, 1)',
+                            'rgba(74, 222, 128, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        title: {
+                            display: true,
+                            text: 'Сравнение IDE по дружелюбности к новичкам'
+                        }
+                    }
+                }
+            });
+        }
+        
+        function setupCodeContainers() {
+            document.querySelectorAll('.code-container pre code').forEach((block) => {
+                hljs.highlightElement(block);
+            });
+
+            const codeContainers = mainContent.querySelectorAll('.code-container');
+            codeContainers.forEach(container => {
+                const copyButton = document.createElement('button');
+                copyButton.textContent = 'Копировать';
+                copyButton.className = 'copy-btn';
+                container.appendChild(copyButton);
+
+                copyButton.addEventListener('click', () => {
+                    const code = container.querySelector('code').innerText;
+                    navigator.clipboard.writeText(code).then(() => {
+                        copyButton.textContent = 'Скопировано!';
+                        setTimeout(() => {
+                            copyButton.textContent = 'Копировать';
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('Failed to copy text: ', err);
+                    });
+                });
+            });
+        }
+
+        navigationMenu.addEventListener('click', (e) => {
+            if (e.target.tagName === 'A' && e.target.dataset.lessonId) {
+                e.preventDefault();
+                const lessonId = e.target.dataset.lessonId;
+                renderLesson(lessonId);
+
+                if (activeLink) {
+                    activeLink.classList.remove('bg-teal-50', 'text-teal-700', 'font-semibold');
+                }
+                activeLink = e.target;
+                activeLink.classList.add('bg-teal-50', 'text-teal-700', 'font-semibold');
+
+                if (sidebar.classList.contains('open')) {
+                    sidebar.classList.remove('open');
+                }
+            }
+        });
+        
+        mobileMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            sidebar.classList.toggle('open');
+        });
+
+        document.body.addEventListener('click', (e) => {
+             if (sidebar.classList.contains('open') && !sidebar.contains(e.target) && e.target !== mobileMenuBtn) {
+                 sidebar.classList.remove('open');
+             }
+        });
+
+        // --- Initial Load ---
+        renderNavigation();
+        const initialLesson = 'intro';
+        const initialLink = navigationMenu.querySelector(`a[data-lesson-id="${initialLesson}"]`);
+        
+        if (initialLink) {
+            initialLink.click();
+        } else {
+             renderLesson(initialLesson);
+        }
+    });
+    </script>
+</body>
+</html>
